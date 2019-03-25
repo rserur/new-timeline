@@ -40,5 +40,9 @@ defmodule NewTimelineWeb.Endpoint do
     key: "_new_timeline_key",
     signing_salt: "0pIvNuf2"
 
+  plug Corsica,
+    origins: "http://localhost:3000",
+    log: [rejected: :error, invalid: :warn, accepted: :debug]
+
   plug NewTimelineWeb.Router
 end
