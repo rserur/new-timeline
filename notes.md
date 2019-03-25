@@ -4,7 +4,7 @@ $ mix phx.new new-timeline --app new_timeline --module NewTimeline --no-html --n
 
 $ mix phx.gen.context Accounts User users username:string:unique name:string is_active:boolean
 
-
+mix phx.gen.json Accounts User users username:string name:string is_active:boolean --no-context --no-schema
 
 ```
 
