@@ -16,3 +16,5 @@ config :new_timeline, NewTimeline.Repo,
   database: "new_timeline_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :bcrypt_elixir, :log_rounds, 4
