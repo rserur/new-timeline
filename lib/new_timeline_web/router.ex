@@ -7,6 +7,6 @@ defmodule NewTimelineWeb.Router do
 
   scope "/api", NewTimelineWeb do
     pipe_through :api
-    resources "/users", UserController, except: [:new, :edit]
+    resources "/users", UserController, except: [:edit]
   end
 end
