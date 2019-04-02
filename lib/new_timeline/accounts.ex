@@ -202,6 +202,7 @@ defmodule NewTimeline.Accounts do
     User.registration_changeset(user, params)
   end
 
+
   def register_user(attrs \\ %{}) do
     %User{}
     |> User.registration_changeset(attrs)

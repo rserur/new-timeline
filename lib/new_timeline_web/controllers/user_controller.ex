@@ -1,8 +1,8 @@
 defmodule NewTimelineWeb.UserController do
   use NewTimelineWeb, :controller
-
   alias NewTimeline.Accounts
   alias NewTimeline.Accounts.User
+  alias NewTimeline.Accounts.Credential
 
   action_fallback NewTimelineWeb.FallbackController
 
@@ -51,8 +51,9 @@ defmodule NewTimelineWeb.UserController do
     end
   end
 
-  def new(conn, _params) do
-    changeset = Accounts.change_registration(%User{}, %{})
-    render(conn, "new.json", changeset: changeset)
-  end
+  # def new(conn, _params) do
+  #   credential = Map.from_struct(%Credential{})
+  #   changeset = Accounts.change_registration(%User{}, %{credential: credential})
+  #   render(conn, "new.json", changeset: changeset)
+  # end
 end

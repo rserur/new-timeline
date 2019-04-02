@@ -1,5 +1,4 @@
 defmodule NewTimelineWeb.UserView do
-  require IEx
   use NewTimelineWeb, :view
   alias NewTimelineWeb.UserView
 
@@ -18,8 +17,12 @@ defmodule NewTimelineWeb.UserView do
       is_active: user.is_active}
   end
 
-  def render("new.json", %{changeset: changeset}) do
-      IEx.pry
-    # %{data: render_one(user, UserView, "changeset.json")}
-  end
+  # def render("new.json", %{changeset: changeset}) do
+  #   %{username: user.username,
+  #     name: user.name,
+  #     is_active: user.is_active,
+  #     credential: %{
+  #     }
+  #   }
+  # end
 end
