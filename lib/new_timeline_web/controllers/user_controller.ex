@@ -1,10 +1,12 @@
 defmodule NewTimelineWeb.UserController do
   use NewTimelineWeb, :controller
+
   alias NewTimeline.Accounts
   alias NewTimeline.Accounts.User
-  alias NewTimeline.Accounts.Credential
 
   action_fallback NewTimelineWeb.FallbackController
+
+  plug :authenticate when action in [:index, :show]
 
   def index(conn, _params) do
     users = Accounts.list_users()
@@ -15,19 +17,13 @@ defmodule NewTimelineWeb.UserController do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
         conn
+        |> NewTimelineWeb.Auth.login(user)
         |> put_status(:created)
         |> put_resp_header("location", Routes.user_path(conn, :show, user))
         |> render("show.json", user: user)
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.json", changeset: changeset)
     end
-    #
-    # with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
-      # conn
-      # |> put_status(:created)
-      # |> put_resp_header("location", Routes.user_path(conn, :show, user))
-      # |> render("show.json", user: user)
-    # end
   end
 
   def show(conn, %{"id" => id}) do
@@ -51,9 +47,14 @@ defmodule NewTimelineWeb.UserController do
     end
   end
 
-  # def new(conn, _params) do
-  #   credential = Map.from_struct(%Credential{})
-  #   changeset = Accounts.change_registration(%User{}, %{credential: credential})
-  #   render(conn, "new.json", changeset: changeset)
-  # end
+  defp authenticate(conn, _opts) do
+    if conn.assigns.current_user do
+      conn
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> render(NewTimelineWeb.ErrorView, "401.json", message: "Unauthenticated user")
+      |> halt()
+    end
+  end
 end
