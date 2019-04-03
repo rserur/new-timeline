@@ -11,17 +11,18 @@ defmodule NewTimelineWeb.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id, email: user.email, is_active: user.is_active}
+    %{id: user.id,
+      username: user.username,
+      name: user.name,
+      is_active: user.is_active}
   end
 
-  def render("sign_in.json", %{user: user}) do
-    %{
-      data: %{
-        user: %{
-          id: user.id,
-          email: user.email
-        }
-      }
-    }
-  end
+  # def render("new.json", %{changeset: changeset}) do
+  #   %{username: user.username,
+  #     name: user.name,
+  #     is_active: user.is_active,
+  #     credential: %{
+  #     }
+  #   }
+  # end
 end

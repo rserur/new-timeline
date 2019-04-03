@@ -41,8 +41,8 @@ defmodule NewTimeline.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:bcrypt_elixir, "~> 1.0"},
-      {:corsica, "~> 1.0"}
+      {:comeonin, "~> 4.1"},
+      {:pbkdf2_elixir, "~> 0.12"}
     ]
   end
 

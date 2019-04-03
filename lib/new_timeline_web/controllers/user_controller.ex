@@ -1,60 +1,60 @@
 defmodule NewTimelineWeb.UserController do
   use NewTimelineWeb, :controller
 
-  alias NewTimeline.Auth
-  alias NewTimeline.Auth.User
+  alias NewTimeline.Accounts
+  alias NewTimeline.Accounts.User
 
   action_fallback NewTimelineWeb.FallbackController
 
+  plug :authenticate when action in [:index, :show]
+
   def index(conn, _params) do
-    users = Auth.list_users()
+    users = Accounts.list_users()
     render(conn, "index.json", users: users)
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Auth.create_user(user_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", Routes.user_path(conn, :show, user))
-      |> render("show.json", user: user)
+    case Accounts.register_user(user_params) do
+      {:ok, user} ->
+        conn
+        |> NewTimelineWeb.Auth.login(user)
+        |> put_status(:created)
+        |> put_resp_header("location", Routes.user_path(conn, :show, user))
+        |> render("show.json", user: user)
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, "new.json", changeset: changeset)
     end
   end
 
   def show(conn, %{"id" => id}) do
-    user = Auth.get_user!(id)
+    user = Accounts.get_user!(id)
     render(conn, "show.json", user: user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Auth.get_user!(id)
+    user = Accounts.get_user!(id)
 
-    with {:ok, %User{} = user} <- Auth.update_user(user, user_params) do
+    with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    user = Auth.get_user!(id)
+    user = Accounts.get_user!(id)
 
-    with {:ok, %User{}} <- Auth.delete_user(user) do
+    with {:ok, %User{}} <- Accounts.delete_user(user) do
       send_resp(conn, :no_content, "")
     end
   end
 
-  def sign_in(conn, %{"email" => email, "password" => password}) do
-    case NewTimeline.Auth.authenticate_user(email, password) do
-      {:ok, user} ->
-        conn
-        |> put_session(:current_user_id, user.id)
-        |> put_status(:ok)
-        |> render("sign_in.json", user: user)
-
-      {:error, message} ->
-        conn
-        |> delete_session(:current_user_id)
-        |> put_status(:unauthorized)
-        |> put_view(NewTimelineWeb.ErrorView)
-        |> render("401.json", message: message)
+  defp authenticate(conn, _opts) do
+    if conn.assigns.current_user do
+      conn
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> render(NewTimelineWeb.ErrorView, "401.json", message: "Unauthenticated user")
+      |> halt()
     end
   end
 end

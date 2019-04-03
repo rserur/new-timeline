@@ -1,53 +1,34 @@
 defmodule NewTimelineWeb.UserControllerTest do
   use NewTimelineWeb.ConnCase
 
-  alias NewTimeline.Auth
-  alias NewTimeline.Auth.User
-  alias Plug.Test
+  alias NewTimeline.Accounts
+  alias NewTimeline.Accounts.User
 
   @create_attrs %{
-    email: "some email",
     is_active: true,
-    password: "some password"
+    name: "some name",
+    username: "some username"
   }
   @update_attrs %{
-    email: "some updated email",
     is_active: false,
-    password: "some updated password"
+    name: "some updated name",
+    username: "some updated username"
   }
-  @invalid_attrs %{email: nil, is_active: nil, password: nil}
-  @current_user_attrs %{
-    email: "some current user email",
-    is_active: true,
-    password: "some current user password"
-  }
+  @invalid_attrs %{is_active: nil, name: nil, username: nil}
 
   def fixture(:user) do
-    {:ok, user} = Auth.create_user(@create_attrs)
+    {:ok, user} = Accounts.create_user(@create_attrs)
     user
   end
 
-  def fixture(:current_user) do
-    {:ok, current_user} = Auth.create_user(@current_user_attrs)
-    current_user
-  end
-
   setup %{conn: conn} do
-    {:ok, conn: conn, current_user: current_user} = setup_current_user(conn)
-    {:ok, conn: put_req_header(conn, "accept", "application/json"), current_user: current_user}
+    {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   describe "index" do
-    test "lists all users", %{conn: conn, current_user: current_user} do
+    test "lists all users", %{conn: conn} do
       conn = get(conn, Routes.user_path(conn, :index))
-
-      assert json_response(conn, 200)["data"] == [
-               %{
-                 "id" => current_user.id,
-                 "email" => current_user.email,
-                 "is_active" => current_user.is_active
-               }
-             ]
+      assert json_response(conn, 200)["data"] == []
     end
   end
 
@@ -60,8 +41,9 @@ defmodule NewTimelineWeb.UserControllerTest do
 
       assert %{
                "id" => id,
-               "email" => "some email",
-               "is_active" => true
+               "is_active" => true,
+               "name" => "some name",
+               "username" => "some username"
              } = json_response(conn, 200)["data"]
     end
 
@@ -82,8 +64,9 @@ defmodule NewTimelineWeb.UserControllerTest do
 
       assert %{
                "id" => id,
-               "email" => "some updated email",
-               "is_active" => false
+               "is_active" => false,
+               "name" => "some updated name",
+               "username" => "some updated username"
              } = json_response(conn, 200)["data"]
     end
 
@@ -104,42 +87,5 @@ defmodule NewTimelineWeb.UserControllerTest do
         get(conn, Routes.user_path(conn, :show, user))
       end
     end
-  end
-
-  describe "sign_in user" do
-    test "renders users when user credentials are good", %{conn: conn, current_user: current_user} do
-      conn =
-        post(
-          conn,
-          Routes.user_path(conn, :sign_in, %{
-            email: current_user.email,
-            password: @current_user_attrs.password
-          })
-        )
-
-      assert json_response(conn, 200)["data"] == %{
-               "user" => %{"id" => current_user.id, "email" => current_user.email}
-             }
-    end
-
-    test "renders errors when user credentials are bad", %{conn: conn} do
-      conn =
-        post(conn, Routes.user_path(conn, :sign_in, %{email: "nonexistent email", password: ""}))
-
-      assert json_response(conn, 401)["errors"] == %{"detail" => "Wrong email or password"}
-    end
-  end
-
-  defp create_user(_) do
-    user = fixture(:user)
-    {:ok, user: user}
-  end
-
-  defp setup_current_user(conn) do
-    current_user = fixture(:current_user)
-
-    {:ok,
-     conn: Test.init_test_session(conn, current_user_id: current_user.id),
-     current_user: current_user}
   end
 end
