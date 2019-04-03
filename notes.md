@@ -4,10 +4,9 @@ $ mix phx.new new-timeline --app new_timeline --module NewTimeline --no-html --n
 
 $ mix phx.gen.context Accounts User users username:string:unique name:string is_active:boolean
 
-mix phx.gen.json Accounts User users username:string name:string is_active:boolean --no-context --no-schema
+$ mix phx.gen.json Accounts User users username:string name:string is_active:boolean --no-context --no-schema
 
-mix phx.gen.context Accounts Credential credentials email:string:unique password_hash:string user_id:references:users
-
+$ mix phx.gen.context Accounts Credential credentials email:string:unique password_hash:string user_id:references:users
 ```
 
 # Common Commands

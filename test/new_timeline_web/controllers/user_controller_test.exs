@@ -88,9 +88,4 @@ defmodule NewTimelineWeb.UserControllerTest do
       end
     end
   end
-
-  defp create_user(_) do
-    user = fixture(:user)
-    {:ok, user: user}
-  end
 end
